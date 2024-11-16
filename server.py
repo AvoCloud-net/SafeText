@@ -107,6 +107,10 @@ async def check_user():
 
     user_id = data["id"]
 
+    result = check_user_db(int(user_id))
+
+    return result
+
 
 if __name__ == "__main__":
 
