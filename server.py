@@ -1,4 +1,4 @@
-import quart, json, reds_simple_logger, colorama, sys, time
+import quart, json, reds_simple_logger, colorama, sys, time, string
 from quart import Quart, request
 from colorama import Fore, Style
 from Levenshtein import distance
@@ -43,16 +43,18 @@ def check_chatfilter(input_str: str, badwords, goodwords, threshold=2):
     flagged_words = []
 
     for word in input_data:
-        if word in goodwords:
+        cleaned_word = word.strip(string.punctuation)
+
+        if cleaned_word in goodwords:
             continue
 
         best_match = None
         best_distance = float("inf")
 
         for badword in badwords:
-            current_distance = distance(word, badword)
+            current_distance = distance(cleaned_word, badword)
             if current_distance <= threshold and current_distance < best_distance:
-                best_match = (word, badword, current_distance)
+                best_match = (cleaned_word, badword, current_distance)
                 best_distance = current_distance
 
         if best_match:
