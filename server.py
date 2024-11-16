@@ -66,14 +66,17 @@ def check_chatfilter(input_str: str, badwords, goodwords, threshold=2):
         for badword in badwords:
             current_distance = distance(cleaned_word, badword)
             if current_distance <= threshold and current_distance < best_distance:
-                best_match = {"input_word": cleaned_word, "matched_badword": badword, "distance": current_distance}
+                best_match = {
+                    "input_word": cleaned_word,
+                    "matched_badword": badword,
+                    "distance": current_distance,
+                }
                 best_distance = current_distance
 
         if best_match:
-            return best_match 
+            return best_match
 
-    return {}  
-
+    return {}
 
 
 def check_user_db(input_id: int, ids_list):
