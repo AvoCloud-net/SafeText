@@ -2,3 +2,4 @@ quart
 reds_simple_logger
 pytest
 colorama
+Levenshtein
