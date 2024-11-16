@@ -77,8 +77,7 @@ def check_chatfilter(input_str: str, badwords, goodwords, threshold=2):
 
 
 def check_user_db(input_id: int, ids_list):
-    rt_data = []
-    db_data = None
+    rt_data = {}
     name: str = None
     id: int = 0
     reason: str = None
@@ -90,9 +89,7 @@ def check_user_db(input_id: int, ids_list):
         reason: str = ids_list[str(input_id)]["reason"]
         flagged: bool = True
 
-    db_data = (name, id, reason, flagged)
-
-    rt_data.append(db_data)
+    rt_data = {"name": name, "id": id, "reason": reason, "flagged": flagged}
 
     return rt_data
 
