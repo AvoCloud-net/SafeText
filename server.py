@@ -54,7 +54,7 @@ except Exception as e:
 
 def check_chatfilter(input_str: str, badwords, goodwords, threshold=2):
     input_data = input_str.lower().split()
-    flagged_words = {}
+    flagged_word = {} 
 
     for word in input_data:
         cleaned_word = word.strip(string.punctuation)
@@ -72,9 +72,10 @@ def check_chatfilter(input_str: str, badwords, goodwords, threshold=2):
                 best_distance = current_distance
 
         if best_match:
-            flagged_words[cleaned_word] = best_match
+            flagged_word = best_match 
+            break
 
-    return flagged_words
+    return flagged_word
 
 
 def check_user_db(input_id: int, ids_list):
