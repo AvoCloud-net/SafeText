@@ -45,9 +45,9 @@ def check_chatfilter(input_str: str, badwords, goodwords, threshold=2):
     for word in input_data:
         if word in goodwords:
             continue
-        
+
         best_match = None
-        best_distance = float('inf')
+        best_distance = float("inf")
 
         for badword in badwords:
             current_distance = distance(word, badword)
@@ -67,7 +67,7 @@ async def check_message():
 
     message = data["message"]
     results = check_chatfilter(message, badwords, goodwords)
-    
+
     return results
 
 
