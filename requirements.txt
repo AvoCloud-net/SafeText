@@ -1,3 +1,2 @@
 quart
 reds_simple_logger
-colorma
