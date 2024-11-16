@@ -107,7 +107,7 @@ async def check_user():
 
     user_id = data["id"]
 
-    result = check_user_db(int(user_id))
+    result = check_user_db(int(user_id), ids_list)
 
     return result
 
