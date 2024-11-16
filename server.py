@@ -21,6 +21,11 @@ def load_goodwords():
         return json.load(goodwords_file)
 
 
+def load_ids():
+    with open("ids.json", "r", encoding="utf-8") as ids_list:
+        return json.load(ids_list)
+
+
 logger.working("Loading badwords.json...")
 try:
     badwords = load_badwords()
@@ -35,6 +40,14 @@ try:
     logger.success("Loaded goodwords.json")
 except Exception as e:
     logger.error("Failed to load goodwords.json\n" + str(e))
+    sys.exit(0)
+
+logger.working("Loading ids.json...")
+try:
+    ids_list = load_ids()
+    logger.success("Loaded ids.json")
+except Exception as e:
+    logger.error("Failed to load ids.json\n" + str(e))
     sys.exit(0)
 
 
@@ -63,6 +76,21 @@ def check_chatfilter(input_str: str, badwords, goodwords, threshold=2):
     return flagged_words
 
 
+def check_user_db(input_id: int, ids_list):
+    rt_data = []
+    db_data = None
+    if input_id in ids_list:
+        name: str = ids_list[str(input_id)]["name"]
+        id: int = ids_list[str(input_id)]["id"]
+        reason: str = ids_list[str(input_id)]["reason"]
+        db_data = (name, id, reason)
+
+    if db_data:
+        rt_data.append(db_data)
+
+    return rt_data
+
+
 @server.route("/chatfilter")
 async def check_message():
     data = await request.get_json()
@@ -71,6 +99,13 @@ async def check_message():
     results = check_chatfilter(message, badwords, goodwords)
 
     return results
+
+
+@server.route("/user")
+async def check_user():
+    data = await request.get_json()
+
+    user_id = data["id"]
 
 
 if __name__ == "__main__":
