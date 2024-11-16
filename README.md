@@ -22,3 +22,6 @@ Start the server:
 ```
 python server.py
 ```
+
+## Info
+The server uses 1652 as the default port.
