@@ -87,7 +87,7 @@ def check_user_db(input_id: int, ids_list):
     reason: str = None
     flagged: bool = False
 
-    if input_id in ids_list:
+    if str(input_id) in ids_list:
         name: str = ids_list[str(input_id)]["name"]
         id: int = ids_list[str(input_id)]["id"]
         reason: str = ids_list[str(input_id)]["reason"]
