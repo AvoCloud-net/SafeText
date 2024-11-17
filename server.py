@@ -2,12 +2,13 @@ import quart, json, reds_simple_logger, colorama, sys, time, string
 from quart import Quart, request
 from colorama import Fore, Style
 from Levenshtein import distance
+import hashlib
 
 print(Fore.MAGENTA, "Programm developed by Red_wolf2467")
 print(Fore.MAGENTA, "Starting up chatfilter server...")
 print(Fore.RESET, "")
 server = Quart(__name__)
-logger = reds_simple_logger.Logger()  #
+logger = reds_simple_logger.Logger()
 logger.info("Server init complete! Continuing startup...")
 
 
@@ -24,6 +25,11 @@ def load_goodwords():
 def load_ids():
     with open("ids.json", "r", encoding="utf-8") as ids_list:
         return json.load(ids_list)
+
+
+def load_keys():
+    with open("key_hash.json", "r", encoding="utf-8") as key_hash_list:
+        return json.load(key_hash_list)
 
 
 logger.working("Loading badwords.json...")
@@ -48,6 +54,14 @@ try:
     logger.success("Loaded ids.json")
 except Exception as e:
     logger.error("Failed to load ids.json\n" + str(e))
+    sys.exit(0)
+
+logger.working("Loading key_hash.json...")
+try:
+    key_hash_list = load_keys()
+    logger.success("Loaded key_hash.json")
+except Exception as e:
+    logger.error("Failed to load key_hash.json\n" + str(e))
     sys.exit(0)
 
 
@@ -98,9 +112,18 @@ def check_user_db(input_id: int, ids_list):
     return rt_data
 
 
+
+def hash_string(string: str):
+    hashed = hashlib.sha256(string.encode()).hexdigest()
+    return hashed
+
+
 @server.route("/chatfilter")
 async def check_message():
     data = await request.get_json()
+
+    
+    if hash_string(data["key"]) in ha
 
     message = data["message"]
     results = check_chatfilter(message, badwords, goodwords)
