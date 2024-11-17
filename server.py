@@ -90,6 +90,7 @@ def hash_string(string: str):
 
 @server.route("/chatfilter")
 async def check_message():
+    print("")
     start_time = time.time()
     id = os.urandom(15).hex()
     logger.info(f"Start processing order number chatfilter-{id}")
@@ -114,7 +115,7 @@ async def check_message():
 
 @server.route("/user")
 async def check_user():
-    print()
+    print("")
     start_time = time.time()
     id = os.urandom(15).hex()
     logger.info(f"Start processing order number user-{id}")
