@@ -3,3 +3,8 @@ reds_simple_logger
 pytest
 colorama
 Levenshtein
+anyio
+pytest-tornasync
+pytest-asyncio
+pytest-trio
+pytest-twisted
