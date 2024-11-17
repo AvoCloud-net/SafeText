@@ -12,57 +12,27 @@ logger = reds_simple_logger.Logger()
 logger.info("Server init complete! Continuing startup...")
 
 
-def load_badwords():
-    with open("badwords.json", "r", encoding="utf-8") as badwords_file:
-        return json.load(badwords_file)
+def load_data(file_path):
+    try:
+        with open(file_path, "r", encoding="utf-8") as file:
+            data = json.load(file)
+        return data
+    except FileNotFoundError:
+        return {}
 
 
-def load_goodwords():
-    with open("goodwords.json", "r", encoding="utf-8") as goodwords_file:
-        return json.load(goodwords_file)
+def save_data(file_path, data):
+    with open(file_path, "w", encoding="utf-8") as file:
+        json.dump(data, file, indent=4, ensure_ascii=False)
 
 
-def load_ids():
-    with open("ids.json", "r", encoding="utf-8") as ids_list:
-        return json.load(ids_list)
-
-
-def load_keys():
-    with open("key_hash.json", "r", encoding="utf-8") as key_hash_list:
-        return json.load(key_hash_list)
-
-
-logger.working("Loading badwords.json...")
-try:
-    badwords = load_badwords()
-    logger.success("Loaded badwords.json")
-except Exception as e:
-    logger.error("Failed to load badwords.json\n" + str(e))
-    sys.exit(0)
-
-logger.working("Loading goodwords.json...")
-try:
-    goodwords = load_goodwords()
-    logger.success("Loaded goodwords.json")
-except Exception as e:
-    logger.error("Failed to load goodwords.json\n" + str(e))
-    sys.exit(0)
-
-logger.working("Loading ids.json...")
-try:
-    ids_list = load_ids()
-    logger.success("Loaded ids.json")
-except Exception as e:
-    logger.error("Failed to load ids.json\n" + str(e))
-    sys.exit(0)
-
-logger.working("Loading key_hash.json...")
-try:
-    key_hash_list = load_keys()
-    logger.success("Loaded key_hash.json")
-except Exception as e:
-    logger.error("Failed to load key_hash.json\n" + str(e))
-    sys.exit(0)
+files_and_functions = [
+    ("json/badwords.json", load_data, save_data),
+    ("json/goodwords.json", load_data, save_data),
+    ("json/ids.json", load_data, save_data),
+    ("json/key_hash.json", load_data, save_data),
+    ("json/admin_key_hash.json", load_data, save_data),
+]
 
 
 def check_chatfilter(input_str: str, badwords, goodwords):
@@ -112,7 +82,6 @@ def check_user_db(input_id: int, ids_list):
     return rt_data
 
 
-
 def hash_string(string: str):
     hashed = hashlib.sha256(string.encode()).hexdigest()
     return hashed
@@ -121,9 +90,11 @@ def hash_string(string: str):
 @server.route("/chatfilter")
 async def check_message():
     data = await request.get_json()
-
-    
-    if hash_string(data["key"]) in ha
+    badwords = load_data("json/badwords.json")
+    goodwords = load_data("json/goodwords.json")
+    key_hash_list = load_data("json/key_hash.json")
+    if hash_string(data["key"]) not in key_hash_list:
+        return {"error": "access denied"}
 
     message = data["message"]
     results = check_chatfilter(message, badwords, goodwords)
@@ -134,12 +105,41 @@ async def check_message():
 @server.route("/user")
 async def check_user():
     data = await request.get_json()
+    key_hash_list = load_data("json/key_hash.json")
+    ids_list = load_data("json/ids.json")
+    if hash_string(data["key"]) not in key_hash_list:
+        return {"error": "access denied"}
 
     user_id = data["id"]
 
     result = check_user_db(int(user_id), ids_list)
 
     return result
+
+
+@server.route
+async def add_flagged_user():
+    data = await request.get_json()
+    admin_key_hash_list = load_data("json/admin_key_hash.json")
+    ids_list = load_data("json/ids.json")
+    if hash_string(data["key"]) not in admin_key_hash_list:
+        return {"error": "access denied"}
+
+    user_id = data[str(user_id)]["id"]
+    user_name = data[str(user_id)]["name"]
+    reason = data[str(user_id)]["reason"]
+
+    if str(user_id) in ids_list:
+        return {"success": False, "message": "User already in Database!"}
+    else:
+        ids_list[str(user_id)] = {
+            "id": int(user_id),
+            "name": str(user_name),
+            "reason": str(reason),
+            "flagged": bool(True)
+        }
+        save_data("json/ids.json", ids_list)
+        return {"success": True, "message": "Used was flagged"}
 
 
 if __name__ == "__main__":
