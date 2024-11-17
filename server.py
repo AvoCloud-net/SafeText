@@ -90,7 +90,8 @@ def hash_string(string: str):
 @server.route("/chatfilter")
 async def check_message():
     start_time = time.time()
-    logger.info(f"Start processing order number chatfilter-{uuid.uuid1}")
+    id=uuid.uuid1()
+    logger.info(f"Start processing order number chatfilter-{id}")
     data = await request.get_json()
     badwords = load_data("json/badwords.json")
     goodwords = load_data("json/goodwords.json")
@@ -112,7 +113,7 @@ async def check_message():
 async def check_user():
     print()
     start_time = time.time()
-    id = uuid.uuid1
+    id = uuid.uuid1()
     logger.info(f"Start processing order number user-{id}")
     data = await request.get_json()
     key_hash_list = load_data("json/key_hash.json")
