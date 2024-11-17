@@ -1,3 +1,4 @@
+import os
 import quart, json, reds_simple_logger, colorama, sys, time, string
 from quart import Quart, request
 from colorama import Fore, Style
@@ -90,7 +91,7 @@ def hash_string(string: str):
 @server.route("/chatfilter")
 async def check_message():
     start_time = time.time()
-    id=uuid.uuid1()
+    id = os.urandom(15).hex()
     logger.info(f"Start processing order number chatfilter-{id}")
     data = await request.get_json()
     badwords = load_data("json/badwords.json")
@@ -104,7 +105,9 @@ async def check_message():
 
     end_time = time.time()
     processing_time = end_time - start_time
-    logger.info(f"Processing of order number chatfilter-{id} in {processing_time}s completed.")
+    logger.info(
+        f"Processing of order number chatfilter-{id} in {processing_time}s completed."
+    )
 
     return results
 
@@ -113,7 +116,7 @@ async def check_message():
 async def check_user():
     print()
     start_time = time.time()
-    id = uuid.uuid1()
+    id = os.urandom(15).hex()
     logger.info(f"Start processing order number user-{id}")
     data = await request.get_json()
     key_hash_list = load_data("json/key_hash.json")
@@ -127,7 +130,9 @@ async def check_user():
 
     end_time = time.time()
     processing_time = end_time - start_time
-    logger.info(f"Processing of order number user-{id} in {processing_time}s completed.")
+    logger.info(
+        f"Processing of order number user-{id} in {processing_time}s completed."
+    )
 
     return result
 
