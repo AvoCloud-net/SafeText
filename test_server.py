@@ -40,7 +40,7 @@ def app():
 # Chatfilter Test
 @pytest.mark.asyncio
 async def test_check_chatfilter(app):
-    client = await app.test_client()
+    client = app.test_client()
 
     response = await client.post("/chatfilter", json={"message": "This is a badword1"})
     data = await response.get_json()
@@ -55,7 +55,7 @@ async def test_check_chatfilter(app):
 # User Test
 @pytest.mark.asyncio
 async def test_check_user(app):
-    client = await app.test_client()
+    client = app.test_client()
 
     response = await client.post("/user", json={"id": 123})
     data = await response.get_json()
