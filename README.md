@@ -24,4 +24,4 @@ python server.py
 ```
 
 ## Info
-The server uses 1652 as the default port.
+The server uses "1652" as the default port.
