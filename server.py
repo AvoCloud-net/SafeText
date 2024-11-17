@@ -83,7 +83,7 @@ def check_chatfilter(input_str: str, badwords, goodwords):
 def check_user_db(input_id: int, ids_list):
     rt_data = {}
     name: str = None
-    id: int = 0
+    id: int = input_id
     reason: str = None
     flagged: bool = False
 
