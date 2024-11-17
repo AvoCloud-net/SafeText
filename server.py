@@ -117,7 +117,7 @@ async def check_user():
     return result
 
 
-@server.route
+@server.route("/flagg_user")
 async def add_flagged_user():
     data = await request.get_json()
     admin_key_hash_list = load_data("json/admin_key_hash.json")
@@ -140,6 +140,24 @@ async def add_flagged_user():
         }
         save_data("json/ids.json", ids_list)
         return {"success": True, "message": "Used was flagged"}
+    
+
+@server.route("/deflag_user")
+async def remove_flagged_user():
+    data = await request.get_json()
+    admin_key_hash_list = load_data("json/admin_key_hash.json")
+    ids_list = load_data("json/ids.json")
+    if hash_string(data["key"]) not in admin_key_hash_list:
+        return {"error": "access denied"}
+
+    user_id = data[str(user_id)]["id"]
+
+    if str(user_id) in ids_list:
+        del ids_list[str(user_id)]
+        save_data("json/ids.json", ids_list)
+        return {"success": True, "message": "Used was deflagged"}
+    else:
+        return {"success": False, "message": "User not flagged!"}
 
 
 if __name__ == "__main__":
