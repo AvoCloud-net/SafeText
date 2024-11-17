@@ -5,3 +5,4 @@ colorama
 Levenshtein
 anyio
 pytest-asyncio
+uuid

@@ -2,7 +2,7 @@ import quart, json, reds_simple_logger, colorama, sys, time, string
 from quart import Quart, request
 from colorama import Fore, Style
 from Levenshtein import distance
-import hashlib
+import hashlib, time, uuid
 
 print(Fore.MAGENTA, "Programm developed by Red_wolf2467")
 print(Fore.MAGENTA, "Starting up chatfilter server...")
@@ -89,6 +89,8 @@ def hash_string(string: str):
 
 @server.route("/chatfilter")
 async def check_message():
+    start_time = time.time()
+    logger.info(f"Start processing order number chatfilter-{uuid.uuid1}")
     data = await request.get_json()
     badwords = load_data("json/badwords.json")
     goodwords = load_data("json/goodwords.json")
@@ -99,11 +101,19 @@ async def check_message():
     message = data["message"]
     results = check_chatfilter(message, badwords, goodwords)
 
+    end_time = time.time()
+    processing_time = end_time - start_time
+    logger.info(f"Processing of order number chatfilter-{id} in {processing_time}s completed.")
+
     return results
 
 
 @server.route("/user")
 async def check_user():
+    print()
+    start_time = time.time()
+    id = uuid.uuid1
+    logger.info(f"Start processing order number user-{id}")
     data = await request.get_json()
     key_hash_list = load_data("json/key_hash.json")
     ids_list = load_data("json/ids.json")
@@ -113,6 +123,10 @@ async def check_user():
     user_id = data["id"]
 
     result = check_user_db(int(user_id), ids_list)
+
+    end_time = time.time()
+    processing_time = end_time - start_time
+    logger.info(f"Processing of order number user-{id} in {processing_time}s completed.")
 
     return result
 
@@ -136,11 +150,11 @@ async def add_flagged_user():
             "id": int(user_id),
             "name": str(user_name),
             "reason": str(reason),
-            "flagged": bool(True)
+            "flagged": bool(True),
         }
         save_data("json/ids.json", ids_list)
         return {"success": True, "message": "Used was flagged"}
-    
+
 
 @server.route("/deflag_user")
 async def remove_flagged_user():
