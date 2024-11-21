@@ -37,7 +37,7 @@ files_and_functions = [
 
 
 def check_chatfilter(input_str: str, badwords, goodwords):
-    threshold: int = 1 if len(input_str) < 50 else 2
+    threshold: int = 1 if len(input_str) < 150 else 2
     input_data = input_str.lower().split()
 
     for word in input_data:
