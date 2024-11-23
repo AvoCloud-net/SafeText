@@ -36,7 +36,7 @@ files_and_functions = [
 ]
 
 
-def check_chatfilter(input_str: str, badwords, goodwords):
+def check_chatfilter(input_str: str, badwords, goodwords, cid: int, gid: int):
     threshold: int = 1 if len(input_str) < 50 else 2
     input_data = input_str.lower().split()
 
@@ -56,6 +56,8 @@ def check_chatfilter(input_str: str, badwords, goodwords):
                     "input_word": cleaned_word,
                     "matched_badword": badword,
                     "distance": current_distance,
+                    "cid": cid,
+                    "gid": gid
                 }
                 best_distance = current_distance
 
@@ -102,7 +104,9 @@ async def check_message():
         return {"error": "access denied"}
 
     message = data["message"]
-    results = check_chatfilter(message, badwords, goodwords)
+    cid = data["cid"]
+    gid = data["gid"]
+    results = check_chatfilter(message, badwords, goodwords, cid, gid)
 
     end_time = time.time()
     processing_time = end_time - start_time
