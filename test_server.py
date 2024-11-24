@@ -28,7 +28,7 @@ def app():
         message = data["message"]
         cid = 123
         sid = 123
-        results = check_chatfilter(input_str=message, badwords=badwords, goodwords=goodwords, cid=cid, sid=sid)
+        results = check_chatfilter(input_str=message, badwords=badwords, goodwords=goodwords, cid=cid, gid=sid)
         return jsonify(results)
 
     @app.route("/user", methods=["POST"])
