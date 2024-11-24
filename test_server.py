@@ -26,7 +26,9 @@ def app():
     async def check_message():
         data = await request.get_json()
         message = data["message"]
-        results = check_chatfilter(message, badwords, goodwords)
+        cid = 123
+        sid = 123
+        results = check_chatfilter(input_str=message, badwords=badwords, goodwords=goodwords, cid=cid, sid=sid)
         return jsonify(results)
 
     @app.route("/user", methods=["POST"])
