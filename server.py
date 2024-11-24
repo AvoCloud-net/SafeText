@@ -104,8 +104,12 @@ async def check_message():
         return {"error": "access denied"}
 
     message = data["message"]
-    cid = data["cid"]
-    gid = data["gid"]
+    try:
+        cid = data["cid"]
+        gid = data["gid"]
+    except:
+        cid = None
+        gid = None
     results = check_chatfilter(message, badwords, goodwords, cid, gid)
 
     end_time = time.time()
