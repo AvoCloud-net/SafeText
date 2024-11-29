@@ -114,7 +114,7 @@ async def check_message():
 
     end_time = time.time()
     processing_time = end_time - start_time
-    logger.info(
+    logger.success(
         f"Processing of order number chatfilter-{id} in {processing_time}s completed."
     )
 
@@ -139,7 +139,7 @@ async def check_user():
 
     end_time = time.time()
     processing_time = end_time - start_time
-    logger.info(
+    logger.success(
         f"Processing of order number user-{id} in {processing_time}s completed."
     )
 
