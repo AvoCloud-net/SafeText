@@ -90,7 +90,7 @@ def hash_string(string: str):
     return hashed
 
 
-@server.route("/chatfilter")
+@server.route("/chatfilter", methods=["GET", "POST"])
 async def check_message():
     print("")
     start_time = time.time()
@@ -121,7 +121,7 @@ async def check_message():
     return results
 
 
-@server.route("/user")
+@server.route("/user", methods=["GET", "POST"])
 async def check_user():
     print("")
     start_time = time.time()
@@ -146,7 +146,7 @@ async def check_user():
     return result
 
 
-@server.route("/flagg_user")
+@server.route("/flagg_user", methods=["GET", "POST"])
 async def add_flagged_user():
     data = await request.get_json()
     admin_key_hash_list = load_data("json/admin_key_hash.json")
@@ -171,7 +171,7 @@ async def add_flagged_user():
         return {"success": True, "message": "Used was flagged"}
 
 
-@server.route("/deflag_user")
+@server.route("/deflag_user", methods=["GET", "POST"])
 async def remove_flagged_user():
     data = await request.get_json()
     admin_key_hash_list = load_data("json/admin_key_hash.json")
