@@ -1,13 +1,13 @@
-# Chatfilter Server
+# SafeText
 #### Developed by Red_Wolf2467
 
-Chatfilter Server is a program that hosts an API server. With this API, messages are checked for so-called badwords using a Levenshtein. 
+SafeText is a program that hosts an API server. With this API, messages are checked for so-called badwords using a Levenshtein. 
 
 
 ## Set up
 Clone this project using the following commands:
 ```
-git clone https://github.com/rwolf2467/Chatfilter-Server.git
+git clone https://github.com/rwolf2467/SafeText.git
 ```
 <br>
 Install all required dependencies:
