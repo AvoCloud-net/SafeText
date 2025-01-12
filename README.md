@@ -7,7 +7,7 @@ SafeText is a program that hosts an API server. With this API, messages are chec
 ## Set up
 Clone this project using the following commands:
 ```
-git clone https://github.com/rwolf2467/SafeText.git
+git clone https://github.com/AvoCloud-net/SafeText.git
 ```
 <br>
 Install all required dependencies:
