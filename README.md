@@ -1,7 +1,8 @@
 # SafeText
 #### Developed by Red_Wolf2467
 
-SafeText is a program that hosts an API server. With this API, messages are checked for so-called badwords using a Levenshtein. 
+SafeText is an API server that checks texts for so-called bad words. SafeText is being actively developed and is used by our DiscordBot Baxi and our Minecraft plugin AvoFilter. 
+SafeText works with the help of the Levenstein, the results of which are made available by the API.
 
 
 ## Set up
