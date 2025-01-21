@@ -114,6 +114,8 @@ async def check_message():
 
     end_time = time.time()
     processing_time = end_time - start_time
+    if results:
+        logger.info(f"chatfilter-{id} marked as SPAM.")
     logger.success(
         f"Processing of order number chatfilter-{id} in {processing_time}s completed."
     )
@@ -139,6 +141,8 @@ async def check_user():
 
     end_time = time.time()
     processing_time = end_time - start_time
+    if result["flagged"]:
+        logger.info(f"user-{id}: user is FLAGGED.")
     logger.success(
         f"Processing of order number user-{id} in {processing_time}s completed."
     )
