@@ -90,6 +90,10 @@ def hash_string(string: str):
     return hashed
 
 
+@server.route("/", methods=["GET", "POST"])
+async def home():
+    return "SafeText API online!"
+
 @server.route("/chatfilter", methods=["GET", "POST"])
 async def check_message():
     print("")
