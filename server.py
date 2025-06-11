@@ -37,8 +37,8 @@ files_and_functions = [
 
 
 def check_chatfilter(input_str: str, badwords, goodwords, cid: int, gid: int):
-    threshold: int = 1 if len(input_str) < 150 else 2
-    input_data = input_str.lower().split()
+    threshold: int = 1
+    input_data: str = str(input_str.lower().split()).replace("”", " ").replace("“", " ")
 
     for word in input_data:
         cleaned_word = word.strip(string.punctuation)
@@ -69,9 +69,9 @@ def check_chatfilter(input_str: str, badwords, goodwords, cid: int, gid: int):
 
 def check_user_db(input_id: int, ids_list):
     rt_data = {}
-    name: str = None
+    name: str = ""
     id: int = input_id
-    reason: str = None
+    reason: str = ""
     flagged: bool = False
 
     if str(input_id) in ids_list:
@@ -112,8 +112,8 @@ async def check_message():
         cid = data["cid"]
         gid = data["gid"]
     except:
-        cid = None
-        gid = None
+        cid = 0
+        gid = 0
     results = check_chatfilter(message, badwords, goodwords, cid, gid)
 
     end_time = time.time()
@@ -162,9 +162,9 @@ async def add_flagged_user():
     if hash_string(data["key"]) not in admin_key_hash_list:
         return {"error": "access denied"}
 
-    user_id = data[str(user_id)]["id"]
-    user_name = data[str(user_id)]["name"]
-    reason = data[str(user_id)]["reason"]
+    user_id = data["id"]
+    user_name = data["name"]
+    reason = data["reason"]
 
     if str(user_id) in ids_list:
         return {"success": False, "message": "User already in Database!"}
@@ -187,7 +187,7 @@ async def remove_flagged_user():
     if hash_string(data["key"]) not in admin_key_hash_list:
         return {"error": "access denied"}
 
-    user_id = data[str(user_id)]["id"]
+    user_id = data["id"]
 
     if str(user_id) in ids_list:
         del ids_list[str(user_id)]
