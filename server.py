@@ -84,14 +84,16 @@ def check_user_db(input_id: int, ids_list):
     id: int = input_id
     reason: str = ""
     flagged: bool = False
+    entry_date: str = ""
 
     if str(input_id) in ids_list:
         name: str = ids_list[str(input_id)]["name"]
         id: int = ids_list[str(input_id)]["id"]
         reason: str = ids_list[str(input_id)]["reason"]
+        entry_date: str = ids_list[str(input_id)]["entry_date"]
         flagged: bool = True
 
-    rt_data = {"name": name, "id": id, "reason": reason, "flagged": flagged}
+    rt_data = {"name": name, "id": id, "reason": reason, "flagged": flagged, "entry_date": entry_date}
 
     return rt_data
 
