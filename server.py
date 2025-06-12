@@ -1,9 +1,19 @@
 import os
-import quart, json, reds_simple_logger, colorama, sys, time, string
+import quart
+import json
+import reds_simple_logger
+import colorama
+import sys
+import time
+import string
 from quart import Quart, request
 from colorama import Fore, Style
 from Levenshtein import distance
-import hashlib, time, uuid
+import hashlib
+import time
+import uuid
+import datetime
+
 
 print(Fore.MAGENTA, "Programm developed by Red_wolf2467")
 print(Fore.MAGENTA, "Starting up chatfilter server...")
@@ -38,7 +48,8 @@ files_and_functions = [
 
 def check_chatfilter(input_str: str, badwords, goodwords, cid: int, gid: int):
     threshold: int = 1
-    input_data: str = str(input_str.lower().split()).replace("”", " ").replace("“", " ")
+    input_data: str = str(input_str.lower().split()).replace(
+        "”", " ").replace("“", " ")
 
     for word in input_data:
         cleaned_word = word.strip(string.punctuation)
@@ -93,6 +104,7 @@ def hash_string(string: str):
 @server.route("/", methods=["GET", "POST"])
 async def home():
     return "SafeText API online!"
+
 
 @server.route("/chatfilter", methods=["GET", "POST"])
 async def check_message():
@@ -160,7 +172,7 @@ async def add_flagged_user():
     admin_key_hash_list = load_data("json/admin_key_hash.json")
     ids_list = load_data("json/ids.json")
     if hash_string(data["key"]) not in admin_key_hash_list:
-        return {"error": "access denied"}
+        return {"error": "access denied"}, 401
 
     user_id = data["id"]
     user_name = data["name"]
@@ -173,8 +185,10 @@ async def add_flagged_user():
             "id": int(user_id),
             "name": str(user_name),
             "reason": str(reason),
-            "flagged": bool(True),
+            "entry_date": str(datetime.date.today()),
+            "flagged": True,  
         }
+
         save_data("json/ids.json", ids_list)
         return {"success": True, "message": "Used was flagged"}
 
