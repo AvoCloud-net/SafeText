@@ -73,6 +73,8 @@ def check_chatfilter(
 
                 if badword in c_badwords:
                     best_match["code"] = "custom"
+                else: 
+                    best_match["code"] = "internal"
 
                 best_distance = current_distance
 
