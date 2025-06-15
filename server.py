@@ -70,6 +70,10 @@ def check_chatfilter(
                     "cid": cid,
                     "gid": gid
                 }
+
+                if badword in c_badwords:
+                    best_match["code"] = "custom"
+
                 best_distance = current_distance
 
         if best_match:
