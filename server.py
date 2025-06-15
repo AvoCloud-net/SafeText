@@ -13,6 +13,7 @@ import hashlib
 import time
 import uuid
 import datetime
+from typing import Optional
 
 
 print(Fore.MAGENTA, "Programm developed by Red_wolf2467")
@@ -37,16 +38,15 @@ def save_data(file_path, data):
         json.dump(data, file, indent=4, ensure_ascii=False)
 
 
-files_and_functions = [
-    ("json/badwords.json", load_data, save_data),
-    ("json/goodwords.json", load_data, save_data),
-    ("json/ids.json", load_data, save_data),
-    ("json/key_hash.json", load_data, save_data),
-    ("json/admin_key_hash.json", load_data, save_data),
-]
-
-
-def check_chatfilter(input_str: str, badwords, goodwords, cid: int, gid: int):
+def check_chatfilter(
+    input_str: str,
+    badwords,
+    goodwords,
+    c_badwords: list = [],
+    c_goodwords: list = [],
+    cid: int = 0,
+    gid: int = 0
+):
     threshold: int = 1
     input_data: str = str(input_str.lower().split()).replace(
         "”", " ").replace("“", " ")
@@ -54,13 +54,13 @@ def check_chatfilter(input_str: str, badwords, goodwords, cid: int, gid: int):
     for word in input_data:
         cleaned_word = word.strip(string.punctuation)
 
-        if cleaned_word in goodwords:
+        if cleaned_word in goodwords or cleaned_word in c_goodwords:
             continue
 
         best_match = None
         best_distance = float("inf")
 
-        for badword in badwords:
+        for badword in badwords + c_badwords:
             current_distance = distance(cleaned_word, badword)
             if current_distance <= threshold and current_distance < best_distance:
                 best_match = {
@@ -93,7 +93,8 @@ def check_user_db(input_id: int, ids_list):
         entry_date: str = ids_list[str(input_id)]["entry_date"]
         flagged: bool = True
 
-    rt_data = {"name": name, "id": id, "reason": reason, "flagged": flagged, "entry_date": entry_date}
+    rt_data = {"name": name, "id": id, "reason": reason,
+               "flagged": flagged, "entry_date": entry_date}
 
     return rt_data
 
@@ -114,21 +115,24 @@ async def check_message():
     start_time = time.time()
     id = os.urandom(15).hex()
     logger.info(f"Start processing order number chatfilter-{id}")
-    data = await request.get_json()
+    data: dict = await request.get_json()
     badwords = load_data("json/badwords.json")
     goodwords = load_data("json/goodwords.json")
     key_hash_list = load_data("json/key_hash.json")
     if hash_string(data["key"]) not in key_hash_list:
         return {"error": "access denied"}
 
-    message = data["message"]
+    message: str = data["message"]
+    c_badwords: list = data["c_badwords"]
+    c_goodwords: list = data["c_goodwords"]
     try:
-        cid = data["cid"]
-        gid = data["gid"]
+        cid: int = data["cid"]
+        gid: int = data["gid"]
     except:
-        cid = 0
-        gid = 0
-    results = check_chatfilter(message, badwords, goodwords, cid, gid)
+        cid: int = 0
+        gid: int = 0
+    results = check_chatfilter(
+        message, badwords, goodwords, c_badwords, c_goodwords, cid, gid)
 
     end_time = time.time()
     processing_time = end_time - start_time
@@ -188,7 +192,7 @@ async def add_flagged_user():
             "name": str(user_name),
             "reason": str(reason),
             "entry_date": str(datetime.date.today()),
-            "flagged": True,  
+            "flagged": True,
         }
 
         save_data("json/ids.json", ids_list)
