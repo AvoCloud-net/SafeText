@@ -123,8 +123,9 @@ async def check_message():
         return {"error": "access denied"}
 
     message: str = data["message"]
-    c_badwords: list = data["c_badwords"]
-    c_goodwords: list = data["c_goodwords"]
+    c_badwords: list = data.get("c_badwords", [])
+    c_goodwords: list = data.get("c_goodwords", [])
+
     try:
         cid: int = data["cid"]
         gid: int = data["gid"]
