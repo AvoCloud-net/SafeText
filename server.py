@@ -9,11 +9,11 @@ import string
 from quart import Quart, request
 from colorama import Fore, Style
 from Levenshtein import distance
+from typing import Optional, List
 import hashlib
 import time
 import uuid
 import datetime
-from typing import Optional
 
 
 print(Fore.MAGENTA, "Programm developed by Red_wolf2467")
@@ -40,16 +40,27 @@ def save_data(file_path, data):
 
 def check_chatfilter(
     input_str: str,
-    badwords,
-    goodwords,
-    c_badwords: list = [],
-    c_goodwords: list = [],
+    badwords: List[str],
+    goodwords: List[str],
+    c_badwords: Optional[List[str]] = None,
+    c_goodwords: Optional[List[str]] = None,
     cid: int = 0,
     gid: int = 0
 ):
-    threshold: int = 1
-    input_data: str = str(input_str.lower().split()).replace(
-        "”", " ").replace("“", " ")
+    import string
+
+    if c_badwords is None:
+        c_badwords = []
+    if c_goodwords is None:
+        c_goodwords = []
+
+    threshold = 1
+    input_data = input_str.lower().replace("”", " ").replace("“", " ").split()
+
+    badwords = [w.lower() for w in badwords]
+    goodwords = [w.lower() for w in goodwords]
+    c_badwords = [w.lower() for w in c_badwords]
+    c_goodwords = [w.lower() for w in c_goodwords]
 
     for word in input_data:
         cleaned_word = word.strip(string.punctuation)
@@ -62,6 +73,7 @@ def check_chatfilter(
 
         for badword in badwords + c_badwords:
             current_distance = distance(cleaned_word, badword)
+
             if current_distance <= threshold and current_distance < best_distance:
                 best_match = {
                     "input_word": cleaned_word,
@@ -70,12 +82,7 @@ def check_chatfilter(
                     "cid": cid,
                     "gid": gid
                 }
-
-                if badword in c_badwords:
-                    best_match["code"] = "custom"
-                else: 
-                    best_match["code"] = "internal"
-
+                best_match["code"] = "custom" if badword in c_badwords else "internal"
                 best_distance = current_distance
 
         if best_match:
@@ -117,37 +124,46 @@ async def home():
 
 @server.route("/chatfilter", methods=["GET", "POST"])
 async def check_message():
-    print("")
     start_time = time.time()
     id = os.urandom(15).hex()
     logger.info(f"Start processing order number chatfilter-{id}")
-    data: dict = await request.get_json()
-    badwords = load_data("json/badwords.json")
-    goodwords = load_data("json/goodwords.json")
+
+    data = await request.get_json(silent=True)
+
+    if not data:
+        return {"error": "No JSON payload received"}, 400
+
+    badwords_data = load_data("json/badwords.json")
+    goodwords_data = load_data("json/goodwords.json")
+
+    badwords = badwords_data.get("badwords", []) if isinstance(
+        badwords_data, dict) else badwords_data
+    goodwords = goodwords_data.get("goodwords", []) if isinstance(
+        goodwords_data, dict) else goodwords_data
+
     key_hash_list = load_data("json/key_hash.json")
-    if hash_string(data["key"]) not in key_hash_list:
-        return {"error": "access denied"}
 
-    message: str = data["message"]
-    c_badwords: list = data.get("c_badwords", [])
-    c_goodwords: list = data.get("c_goodwords", [])
+    key = data.get("key")
+    if not key or hash_string(key) not in key_hash_list:
+        return {"error": "access denied"}, 403
 
-    try:
-        cid: int = data["cid"]
-        gid: int = data["gid"]
-    except:
-        cid: int = 0
-        gid: int = 0
+    message = data.get("message", "")
+    c_badwords = data.get("c_badwords", [])
+    c_goodwords = data.get("c_goodwords", [])
+
+    cid = data.get("cid", 0)
+    gid = data.get("gid", 0)
+
     results = check_chatfilter(
         message, badwords, goodwords, c_badwords, c_goodwords, cid, gid)
 
     end_time = time.time()
     processing_time = end_time - start_time
+
     if results:
         logger.info(f"chatfilter-{id} marked as SPAM.")
     logger.success(
-        f"Processing of order number chatfilter-{id} in {processing_time}s completed."
-    )
+        f"Processing of order number chatfilter-{id} in {processing_time:.3f}s completed.")
 
     return results
 
