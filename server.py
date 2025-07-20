@@ -45,7 +45,7 @@ def check_chatfilter(
     c_badwords: Optional[List[str]] = None,
     c_goodwords: Optional[List[str]] = None,
     cid: int = 0,
-    gid: int = 0
+    gid: int = 0,
 ):
     import string
 
@@ -65,13 +65,15 @@ def check_chatfilter(
     for word in input_data:
         cleaned_word = word.strip(string.punctuation)
 
-        if cleaned_word in goodwords or cleaned_word in c_goodwords:
+        if (
+            cleaned_word in goodwords or cleaned_word in c_goodwords
+        ) and cleaned_word not in c_badwords:
             continue
 
         best_match = None
         best_distance = float("inf")
 
-        for badword in badwords + c_badwords:
+        for badword in c_badwords + badwords:
             current_distance = distance(cleaned_word, badword)
 
             if current_distance <= threshold and current_distance < best_distance:
@@ -80,7 +82,7 @@ def check_chatfilter(
                     "matched_badword": badword,
                     "distance": current_distance,
                     "cid": cid,
-                    "gid": gid
+                    "gid": gid,
                 }
                 best_match["code"] = "custom" if badword in c_badwords else "internal"
                 best_distance = current_distance
@@ -106,8 +108,13 @@ def check_user_db(input_id: int, ids_list):
         entry_date: str = ids_list[str(input_id)]["entry_date"]
         flagged: bool = True
 
-    rt_data = {"name": name, "id": id, "reason": reason,
-               "flagged": flagged, "entry_date": entry_date}
+    rt_data = {
+        "name": name,
+        "id": id,
+        "reason": reason,
+        "flagged": flagged,
+        "entry_date": entry_date,
+    }
 
     return rt_data
 
@@ -136,10 +143,16 @@ async def check_message():
     badwords_data = load_data("json/badwords.json")
     goodwords_data = load_data("json/goodwords.json")
 
-    badwords = badwords_data.get("badwords", []) if isinstance(
-        badwords_data, dict) else badwords_data
-    goodwords = goodwords_data.get("goodwords", []) if isinstance(
-        goodwords_data, dict) else goodwords_data
+    badwords = (
+        badwords_data.get("badwords", [])
+        if isinstance(badwords_data, dict)
+        else badwords_data
+    )
+    goodwords = (
+        goodwords_data.get("goodwords", [])
+        if isinstance(goodwords_data, dict)
+        else goodwords_data
+    )
 
     key_hash_list = load_data("json/key_hash.json")
 
@@ -155,7 +168,8 @@ async def check_message():
     gid = data.get("gid", 0)
 
     results = check_chatfilter(
-        message, badwords, goodwords, c_badwords, c_goodwords, cid, gid)
+        message, badwords, goodwords, c_badwords, c_goodwords, cid, gid
+    )
 
     end_time = time.time()
     processing_time = end_time - start_time
@@ -163,7 +177,8 @@ async def check_message():
     if results:
         logger.info(f"chatfilter-{id} marked as SPAM.")
     logger.success(
-        f"Processing of order number chatfilter-{id} in {processing_time:.3f}s completed.")
+        f"Processing of order number chatfilter-{id} in {processing_time:.3f}s completed."
+    )
 
     return results
 
@@ -241,5 +256,4 @@ async def remove_flagged_user():
 
 
 if __name__ == "__main__":
-
     server.run(host="0.0.0.0", port=1652)
