@@ -143,11 +143,12 @@ async def check_message():
     badwords_data = load_data("json/badwords.json")
     goodwords_data = load_data("json/goodwords.json")
 
-    badwords = (
-        badwords_data.get("badwords", [])
-        if isinstance(badwords_data, dict)
-        else badwords_data
-    )
+    lang = data.get("lang", "en").lower()
+    if isinstance(badwords_data, dict) and ("en" in badwords_data or "de" in badwords_data):
+        badwords = badwords_data.get(lang, badwords_data.get("en", []))
+    else:
+        badwords = badwords_data.get("badwords", []) if isinstance(badwords_data, dict) else badwords_data
+
     goodwords = (
         goodwords_data.get("goodwords", [])
         if isinstance(goodwords_data, dict)
