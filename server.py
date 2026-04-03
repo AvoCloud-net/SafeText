@@ -54,8 +54,7 @@ def check_chatfilter(
     if c_goodwords is None:
         c_goodwords = []
 
-    threshold = 1
-    input_data = input_str.lower().replace("”", " ").replace("“", " ").split()
+    input_data = input_str.lower().replace(chr(0x201C), " ").replace(chr(0x201D), " ").split()
 
     badwords = [w.lower() for w in badwords]
     goodwords = [w.lower() for w in goodwords]
@@ -74,6 +73,18 @@ def check_chatfilter(
         best_distance = float("inf")
 
         for badword in c_badwords + badwords:
+            # Threshold scales with word length to avoid false positives on short words:
+            # ≤4 chars → exact match only (threshold 0)
+            # 5–7 chars → threshold 1
+            # ≥8 chars → threshold 2
+            word_len = min(len(cleaned_word), len(badword))
+            if word_len <= 4:
+                threshold = 0
+            elif word_len <= 7:
+                threshold = 1
+            else:
+                threshold = 2
+
             current_distance = distance(cleaned_word, badword)
 
             if current_distance <= threshold and current_distance < best_distance:
